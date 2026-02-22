@@ -14,28 +14,28 @@ _local_nonce = None
 
 CONTRACT_ABI = [
 	{
-		"anonymous": false,
+		"anonymous": False,
 		"inputs": [
 			{
-				"indexed": true,
+				"indexed": True,
 				"internalType": "uint256",
 				"name": "sensorId",
 				"type": "uint256"
 			},
 			{
-				"indexed": false,
+				"indexed": False,
 				"internalType": "int256",
 				"name": "value",
 				"type": "int256"
 			},
 			{
-				"indexed": false,
+				"indexed": False,
 				"internalType": "string",
 				"name": "location",
 				"type": "string"
 			},
 			{
-				"indexed": false,
+				"indexed": False,
 				"internalType": "uint256",
 				"name": "timestamp",
 				"type": "uint256"
