@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: postgres_measurements
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./backend
+    container_name: fastapi_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: db
+      DB_PORT: 5432
+      WEB3_PROVIDER_URI: http://ganache:8545
+      PRIVATE_KEY: 0x6253e7a56ee838a325bd0497ae5e58cace66792c5c9e23dea30b6dabcea95ec6
+      CONTRACT_ADDRESS: 0x582e0dCce2946Fa4660A654695c3316C8F541ED7
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app_network
+
+  ganache:
+    image: trufflesuite/ganache:latest
+    container_name: ganache_node
+    ports:
+      - "8545:8545"
+    command: ["--wallet.seed", "test test test test test test test test test test test junk", "--server.port", "8545", "--server.host", "0.0.0.0"]
+    networks:
+      - app_network
+
+volumes:
+  pgdata:
+
+networks:
+  app_network:
